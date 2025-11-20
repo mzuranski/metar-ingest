@@ -1,0 +1,175 @@
+version: '1.0'
+services:
+  metar:
+    type: feature
+    title: METAR Data Ingestion
+    description: API for ingesting and serving METAR data
+    endpoints:
+      - path: /metar
+        method: GET
+        description: Retrieve METAR data
+        parameters:
+          - name: station
+            in: query
+            required: true
+            description: ICAO station identifier
+            schema:
+              type: string
+      - path: /metar
+        method: POST
+        description: Ingest new METAR data
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metar:
+                    type: string
+                    description: The METAR string to be ingested
+    data:
+      - name: metar_data
+        type: database
+        source: postgis
+        connection: postgresql://user:password@localhost:5432/metar_db
+    logging:
+      level: info
+      format: json
+      handlers:
+        - type: console
+        - type: file
+          filename: logs/metar.log
+          maxSize: 10MB
+          maxFiles: 5
+    security:
+      - type: apiKey
+        name: api_key
+        in: header
+    metadata:
+      created: 2023-10-01
+      updated: 2023-10-01
+      author: Your Name
+      license: MIT
+
+# pygeoapi configuration for serving METAR observations
+
+server:
+    bind:
+        host: 0.0.0.0
+        port: 5000
+    url: http://localhost:5000
+    mimetype: application/json; charset=UTF-8
+    encoding: utf-8
+    gzip: false
+    languages:
+        - en-US
+    cors: true
+    pretty_print: true
+    limit: 500
+    map:
+        url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+
+logging:
+    level: INFO
+
+metadata:
+    identification:
+        title: METAR Observation Service
+        description: API for accessing METAR weather observations
+        keywords:
+            - METAR
+            - weather
+            - observations
+        keywords_type: theme
+        terms_of_service: https://creativecommons.org/licenses/by/4.0/
+        url: http://localhost:5000
+    license:
+        name: GPL-3.0
+        url: https://www.gnu.org/licenses/gpl-3.0.en.html
+    provider:
+        name: Your Organization
+        url: http://example.org
+    contact:
+        name: Your Name
+        email: you@example.org
+
+resources:
+    observations:
+        type: collection
+        title: METAR Observations
+        description: Recent METAR weather observations
+        keywords:
+            - METAR
+            - observations
+        links:
+            - type: text/html
+              rel: canonical
+              title: Information
+              href: http://localhost:5000
+              hreflang: en-US
+        extents:
+            spatial:
+                bbox: [-180, -90, 180, 90]
+                crs: http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            temporal:
+                begin: 2024-01-01T00:00:00Z
+                end: null
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: localhost
+                  port: 5432
+                  dbname: metar_obs
+                  user: metar_user
+                  password: changeme
+                  search_path: [public]
+              id_field: id
+              table: observations
+              geom_field: location
+              time_field: observation_time
+              properties:
+                  - station_id
+                  - observation_time
+                  - raw_metar
+                  - raw_remarks
+
+    observation_elements:
+        type: collection
+        title: METAR Observation Elements
+        description: Individual meteorological elements from METAR observations
+        keywords:
+            - METAR
+            - elements
+            - temperature
+            - wind
+        links:
+            - type: text/html
+              rel: canonical
+              title: Information
+              href: http://localhost:5000
+              hreflang: en-US
+        extents:
+            temporal:
+                begin: 2024-01-01T00:00:00Z
+                end: null
+        providers:
+            - type: feature
+              name: PostgreSQL
+              data:
+                  host: localhost
+                  port: 5432
+                  dbname: metar_obs
+                  user: metar_user
+                  password: changeme
+                  search_path: [public]
+              id_field: id
+              table: observation_elements
+              properties:
+                  - observation_id
+                  - element_type
+                  - element_value
+                  - element_unit
+                  - element_quality

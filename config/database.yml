@@ -1,0 +1,27 @@
+# Database configuration for METAR ingestion system
+
+# PostgreSQL connection settings
+database:
+  host: localhost
+  port: 5432
+  name: metar_obs
+  user: metar_user
+  password: metarpass1!
+  
+  # Connection pool settings
+  pool:
+    min_connections: 1
+    max_connections: 10
+    
+  # Connection timeouts
+  timeouts:
+    connect_timeout: 10
+    command_timeout: 30
+
+# PostGIS settings
+postgis:
+  srid: 4326  # WGS84 coordinate system
+  
+# Data retention
+retention:
+  days: 30

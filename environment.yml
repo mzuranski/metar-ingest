@@ -1,0 +1,11 @@
+name: metar-ingest
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - python-metar>=1.4.0
+  - psycopg2>=2.9.9
+  - pyyaml>=6.0
+  - python-dotenv>=1.0.0
+  - pip

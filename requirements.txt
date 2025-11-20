@@ -1,0 +1,18 @@
+# Core dependencies
+python-metar>=1.4.0
+psycopg2-binary>=2.9.9
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+
+# Geospatial
+metpy>=1.5.0
+
+# Database
+sqlalchemy>=2.0.23
+geoalchemy2>=0.14.2
+
+# Utilities
+
+# Testing
+pytest>=7.4.3
+pytest-cov>=4.1.0
