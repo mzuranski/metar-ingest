@@ -66,10 +66,12 @@ server:
         - en-US
     cors: true
     pretty_print: true
-    limit: 500
     map:
         url: https://tile.openstreetmap.org/{z}/{x}/{y}.png
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    limits:
+        default_items: 10
+        max_items: 3000
 
 logging:
     level: INFO
@@ -99,10 +101,11 @@ resources:
     observations:
         type: collection
         title: METAR Observations
-        description: Recent METAR weather observations
+        description: Recent METAR weather observations with complete meteorological data
         keywords:
             - METAR
             - observations
+            - weather
         links:
             - type: text/html
               rel: canonical
@@ -127,49 +130,43 @@ resources:
                   password: changeme
                   search_path: [public]
               id_field: id
-              table: observations
+              table: observations_with_location
               geom_field: location
               time_field: observation_time
               properties:
                   - station_id
+                  - station_name
                   - observation_time
                   - raw_metar
                   - raw_remarks
-
-    observation_elements:
-        type: collection
-        title: METAR Observation Elements
-        description: Individual meteorological elements from METAR observations
-        keywords:
-            - METAR
-            - elements
-            - temperature
-            - wind
-        links:
-            - type: text/html
-              rel: canonical
-              title: Information
-              href: http://localhost:5000
-              hreflang: en-US
-        extents:
-            temporal:
-                begin: 2024-01-01T00:00:00Z
-                end: null
-        providers:
-            - type: feature
-              name: PostgreSQL
-              data:
-                  host: localhost
-                  port: 5432
-                  dbname: metar_obs
-                  user: metar_user
-                  password: changeme
-                  search_path: [public]
-              id_field: id
-              table: observation_elements
-              properties:
-                  - observation_id
-                  - element_type
-                  - element_value
-                  - element_unit
-                  - element_quality
+                  - latitude
+                  - longitude
+                  - elevation
+                  - country
+                  - temperature
+                  - temperature_unit
+                  - dewpoint
+                  - dewpoint_unit
+                  - wind_speed
+                  - wind_speed_unit
+                  - wind_direction
+                  - wind_gust
+                  - wind_gust_unit
+                  - visibility
+                  - visibility_unit
+                  - pressure
+                  - pressure_unit
+                  - present_weather
+                  - remarks
+                  - sky_cover_layer_1
+                  - cloud_base_layer_1
+                  - sky_cover_layer_2
+                  - cloud_base_layer_2
+                  - sky_cover_layer_3
+                  - cloud_base_layer_3
+                  - sky_cover_layer_4
+                  - cloud_base_layer_4
+                  - sky_cover_layer_5
+                  - cloud_base_layer_5
+                  - sky_cover_layer_6
+                  - cloud_base_layer_6

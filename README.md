@@ -45,14 +45,41 @@ This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
 4. Initialize database:
    ```bash
-   psql -U postgres -f sql/schema.sql
-   bash scripts/reset_database.sh
+   # Create database
+   psql -U postgres -c "CREATE DATABASE metar_obs;"
+   
+   # Apply schema
+   psql -U postgres -d metar_obs -f sql/schema.sql
+   
+   # Load station metadata
+   python scripts/load_stations.py
    ```
 
 5. Install as package:
    ```bash
    pip install -e .
    ```
+
+## Database Setup
+
+### Schema Overview
+
+The database uses a consolidated schema defined in `sql/schema.sql` with:
+
+1. **stations**: Weather station metadata and locations (PostGIS geometry)
+2. **observations**: METAR observation records
+3. **observation_elements**: Individual weather elements (EAV pattern)
+4. **observations_with_location**: View joining observations with station geometry (for pygeoapi)
+
+### Applying to Existing Database
+
+If you have an existing database with data, you can safely add the location view:
+
+```bash
+psql -U postgres -d metar_obs -f sql/migrations/005_add_location_view.sql
+```
+
+This will not affect your existing data.
 
 ## Usage
 
@@ -88,9 +115,10 @@ crontab -e
 
 ## Database Structure
 
-- `observations`: Main table with raw METAR and location
-- `observation_elements`: Individual meteorological elements
-- `stations`: Station metadata
+- `observations`: Main table with raw METAR and timestamps
+- `observation_elements`: Individual meteorological elements (EAV pattern)
+- `stations`: Station metadata with PostGIS location
+- `observations_with_location`: View combining observations with station geometry (for pygeoapi)
 - `ingest_metrics`: Processing statistics
 
 ## Metrics
